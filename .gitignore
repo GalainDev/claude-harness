@@ -1,0 +1,5 @@
+.DS_Store
+*.backup
+specs/           # project-specific specs live in the project repo, not here
+.rlaif-reports/
+/tmp/

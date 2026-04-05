@@ -1,0 +1,41 @@
+{
+  "_readme": "Maps project identifiers to design systems. Claude checks this on every frontend session. To declare your project's design system, add a .claude/design.json in your project root with { 'system': '<key>' }. Available systems are the keys in 'systems' below.",
+  "defaultSystem": "corporate-saas",
+  "systems": {
+    "minimal-clean": {
+      "description": "Whitespace-heavy, typography-led, Figma/Linear/Raycast aesthetic",
+      "path": "systems/minimal-clean",
+      "primaryFont": "Inter, system-ui",
+      "colorMode": "light-default",
+      "keyTraits": ["generous whitespace", "subtle borders", "no shadows", "neutral palette", "medium weight typography"]
+    },
+    "brutalist": {
+      "description": "Raw, high-contrast, opinionated — bold borders, heavy type, flat color",
+      "path": "systems/brutalist",
+      "primaryFont": "Space Grotesk, monospace fallback",
+      "colorMode": "high-contrast",
+      "keyTraits": ["thick borders", "flat fills", "strong typographic hierarchy", "limited color palette", "deliberate roughness"]
+    },
+    "glassmorphism": {
+      "description": "Frosted glass, blurs, gradients, translucency — modern app aesthetic",
+      "path": "systems/glassmorphism",
+      "primaryFont": "Inter, SF Pro",
+      "colorMode": "dark-default",
+      "keyTraits": ["backdrop-blur", "rgba backgrounds", "gradient borders", "soft shadows", "layered depth"]
+    },
+    "corporate-saas": {
+      "description": "Professional SaaS — Stripe, Notion, Vercel landing page quality",
+      "path": "systems/corporate-saas",
+      "primaryFont": "Inter, system-ui",
+      "colorMode": "light-default",
+      "keyTraits": ["structured grid", "clear hierarchy", "accessible contrast", "subtle shadows", "polished micro-interactions"]
+    },
+    "dark-modern": {
+      "description": "Developer-tool dark UI — VS Code, Vercel dashboard, Raycast dark",
+      "path": "systems/dark-modern",
+      "primaryFont": "Geist, Inter, monospace for code",
+      "colorMode": "dark-default",
+      "keyTraits": ["dark backgrounds", "subtle glows", "high-contrast text", "muted secondary elements", "monospace accents"]
+    }
+  }
+}
