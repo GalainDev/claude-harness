@@ -1,5 +1,5 @@
 {
-  "name": "claude-harness",
+  "name": "@galain/claude-harness",
   "version": "0.1.0",
   "description": "Claude Code skill harness — hooks, skills, and global config",
   "bin": {
