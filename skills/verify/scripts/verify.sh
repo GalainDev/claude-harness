@@ -126,21 +126,14 @@ else
       skip "govulncheck (not installed — run: go install golang.org/x/vuln/cmd/govulncheck@latest)"
     fi
   fi
-  # varlock scan (preferred) — falls back to grep-based scan
-  if command -v varlock &>/dev/null && [[ -f ".env.schema" ]]; then
-    run "varlock scan" varlock scan
-  else
-    if git diff HEAD --name-only &>/dev/null; then
-      SECRETS=$(git diff HEAD 2>/dev/null | grep -iE '(api_key|secret|password|private_key)\s*=\s*["\x27][^"\x27]{8,}' || true)
-      if [[ -z "$SECRETS" ]]; then
-        pass "Secret scan (no obvious secrets in diff)"
-      else
-        fail "Secret scan — potential secrets found in diff"
-        echo "$SECRETS"
-      fi
-    fi
-    if [[ ! -f ".env.schema" ]] && [[ -f ".env.example" || -f ".env" ]]; then
-      skip "varlock not configured — consider: npx varlock init (AI-safe env schema)"
+  # Secret scan — check diff for accidentally committed secrets
+  if git diff HEAD --name-only &>/dev/null; then
+    SECRETS=$(git diff HEAD 2>/dev/null | grep -iE '(api_key|secret|password|private_key)\s*=\s*["\x27][^"\x27]{8,}' || true)
+    if [[ -z "$SECRETS" ]]; then
+      pass "Secret scan (no obvious secrets in diff)"
+    else
+      fail "Secret scan — potential secrets found in diff"
+      echo "$SECRETS"
     fi
   fi
 fi
