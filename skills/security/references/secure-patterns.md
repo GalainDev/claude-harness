@@ -221,7 +221,48 @@ GRANT ALL ON SCHEMA public TO migrator;
 
 ## Secrets Management
 
-### Never in source code
+### AI-safe env management with varlock
+
+`.env.schema` is the source of truth — agents read the schema, never the secrets.
+
+```bash
+# Setup (once per project)
+npx varlock init
+
+# .env.schema — commit this (structure + docs, no values)
+STRIPE_SECRET_KEY:
+  description: Stripe secret key for payment processing
+  required: true
+  secret: true
+
+DATABASE_URL:
+  description: PostgreSQL connection string
+  required: true
+  secret: true
+
+NEXT_PUBLIC_APP_URL:
+  description: Public app URL
+  required: true
+  secret: false
+
+# .env — never commit (real values, gitignored)
+STRIPE_SECRET_KEY=sk_live_...
+DATABASE_URL=postgres://...
+NEXT_PUBLIC_APP_URL=https://myapp.com
+```
+
+**Key split:** Claude can read `.env.schema` (blocked from `.env` by hook). Schema tells Claude what config exists without exposing values.
+
+```bash
+# Scan for leaked secrets
+varlock scan
+
+# Inject validated env into any process
+varlock run -- node server.js
+varlock run -- go run ./cmd/server
+```
+
+### Without varlock (fallback)
 ```bash
 # .env.example — commit this (no real values)
 STRIPE_SECRET_KEY=
@@ -236,7 +277,9 @@ JWT_SECRET=...
 
 ### Detecting committed secrets
 ```bash
-# Before committing
+# Preferred: varlock scan
+
+# Manual fallback — before committing
 git diff --staged | grep -iE \
   '(api_key|apikey|secret|password|passwd|token|private_key|access_key)\s*[:=]\s*[^\s]{8,}'
 

@@ -29,6 +29,11 @@ PATH_ARG=$(echo "$INPUT" | jq -r '
 
 [[ -z "$PATH_ARG" ]] && exit 0
 
+# Explicitly allow .env.schema (safe — contains no secrets, only structure)
+if echo "$PATH_ARG" | grep -qE '\.env\.schema$'; then
+  exit 0
+fi
+
 block() {
   echo "BLOCKED: $1" >&2
   exit 2
