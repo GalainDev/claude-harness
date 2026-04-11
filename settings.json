@@ -6,6 +6,15 @@
   "hooks": {
     "PreToolUse": [
       {
+        "matcher": ".*",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "~/.claude/hooks/block-prompt-injection.sh"
+          }
+        ]
+      },
+      {
         "matcher": "Bash",
         "hooks": [
           {
@@ -15,11 +24,31 @@
         ]
       },
       {
+        "matcher": "Write|Edit",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "~/.claude/hooks/block-write-risks.sh"
+          }
+        ]
+      },
+      {
         "matcher": "Read|Glob|Grep",
         "hooks": [
           {
             "type": "command",
             "command": "~/.claude/hooks/block-sensitive-paths.sh"
+          }
+        ]
+      }
+    ],
+    "PostToolUse": [
+      {
+        "matcher": "WebFetch",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "~/.claude/hooks/block-output-injection.sh"
           }
         ]
       }
