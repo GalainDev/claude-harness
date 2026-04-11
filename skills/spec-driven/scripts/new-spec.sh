@@ -80,11 +80,14 @@ write_task() {
     exit 1
   fi
   cat > "$file" <<EOF
+---
+status: todo
+---
+
 # Task: ${NAME}
 
 **Overview:** specs/overview.md
 **Date:** ${DATE}
-**Status:** Pending
 
 ---
 

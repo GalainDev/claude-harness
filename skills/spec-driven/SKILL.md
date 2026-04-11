@@ -95,10 +95,14 @@ Decompose the overview into task specs following these rules:
 ### Task spec structure
 
 ```markdown
+---
+status: todo
+---
+
 # Task: [Name]
 
 **Overview:** specs/overview.md
-**Status:** Pending | In progress | Done
+**Date:** [date]
 
 ## Context
 [One sentence: what this task does and why it exists in the broader feature]
@@ -129,6 +133,31 @@ specs/
 ```
 
 Update `specs/overview.md` Proposed task breakdown section with the full list once decomposed.
+
+---
+
+## Task Status Lifecycle
+
+Every task spec has a `status` field in its frontmatter. **Keep it current — this is how you pick up where you left off after closing a session.**
+
+| Status | Meaning |
+|--------|---------|
+| `todo` | Created, not started |
+| `in_progress` | Actively being implemented |
+| `blocked` | Waiting on another task or external input |
+| `done` | All ACs checked off, verify passed |
+
+**Rules:**
+- Set `in_progress` when you start implementing a task
+- Set `done` immediately when all ACs pass and `verify.sh` is green — don't batch updates
+- Set `blocked` with a note in the spec explaining what's blocking
+- **After every 2–3 completed implementations, scan all task specs and update any stale statuses**
+
+**Session resume:** at the start of a new session, run:
+```bash
+grep -r "^status:" specs/task-*.md 2>/dev/null | sort
+```
+This gives you the full picture of what's done, in progress, and todo — so you can pick up exactly where you left off without re-reading everything.
 
 ---
 
