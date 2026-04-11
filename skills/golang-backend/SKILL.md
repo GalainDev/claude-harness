@@ -1,14 +1,10 @@
 ---
 name: golang-backend
-description: |
-  Expert Go (Golang) backend engineering skill. Use this whenever the user is writing, reading,
-  debugging, or designing Go code — including HTTP servers, CLIs, gRPC services, background workers,
-  database access, concurrency patterns, or system utilities. Also triggers on: Go module management
-  (go.mod, go.sum), error handling patterns, goroutines and channels, context propagation, middleware,
-  REST or gRPC API design in Go, testing (table-driven tests, testify, httptest), Go toolchain
-  (go build, go test, go generate, go vet, golangci-lint), Dockerfile for Go services,
-  and performance profiling (pprof). Triggers even when the user is learning Go idioms or
-  asking "how do I do X in Go" — provide idiomatic Go, not just working code.
+description: Expert Go (Golang) backend engineering skill. Use whenever the user is writing, reading, debugging, or designing Go code — including HTTP servers, CLIs, gRPC services, background workers, database access, concurrency patterns, or system utilities. Also triggers on Go module management, error handling patterns, goroutines and channels, context propagation, middleware, REST/gRPC API design, testing (table-driven, testify, httptest), Go toolchain (build, vet, golangci-lint), Dockerfile for Go services, and pprof profiling. Provides idiomatic Go, not just working code.
+metadata:
+  author: galain
+  version: 1.0.0
+  category: backend
 ---
 
 # Go Backend Skill

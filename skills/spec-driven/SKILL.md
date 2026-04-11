@@ -1,20 +1,166 @@
 ---
 name: spec-driven
-description: |
-  Spec-driven development with an iterative RLAIF (Reinforcement Learning from AI Feedback) loop.
-  Use this skill when the user wants to build something from a spec or requirements, is doing
-  spec-first or test-first development, wants to define behavior before writing code, needs to
-  refine requirements iteratively, asks "can we spec this out first", mentions BDD, ATDD, or
-  specification by example, wants to break down a feature into verifiable units before coding,
-  or wants Claude to self-evaluate and improve its own output through iteration.
-  The loop: Spec → Implement → Self-Evaluate → Reflect → Iterate until acceptance criteria pass.
+description: Spec-driven development with a living overview and RLAIF loop. ALWAYS activates when the user discusses a new feature, app, or system — even in early conversation. Continuously updates specs/overview.md as requirements emerge. Use /decompose to break the overview into atomic task specs when ready to build. Each task spec runs its own Implement → Evaluate → Reflect → Iterate loop. Also triggers on "spec this out", "let's plan", "I want to build", BDD/ATDD mentions, or any feature discussion.
+user-invocable: true
+metadata:
+  author: galain
+  version: 1.0.0
+  category: engineering
 ---
 
 # Spec-Driven Development Skill
 
-Spec-first engineering with an embedded RLAIF feedback loop. Instead of jumping straight to code,
-we define acceptance criteria first — then implement, evaluate against the spec, reflect on gaps,
-and iterate. This produces more correct code with fewer surprises.
+Two levels: an **overview** that evolves through conversation, and **task specs** that are small enough to implement and verify in one RLAIF loop.
+
+**Don't wait to be asked.** When the user describes a feature or app — even casually — start capturing it in `specs/overview.md`. Update it continuously as the conversation develops. When the user is ready to build, `/decompose` breaks the overview into task specs.
+
+---
+
+## Level 1 — Overview Spec (always-on)
+
+`specs/overview.md` is a living document. It is never "done" — it grows with the conversation.
+
+Create it the moment a feature or app is being discussed. Update it after every meaningful exchange. It does not need to be complete or correct before you start — that's the point.
+
+### Structure
+
+```markdown
+# Overview: [Feature / App Name]
+
+**Last updated:** [date]
+**Status:** Exploring | Ready to decompose | In progress | Done
+
+## What we're building
+[One paragraph. What is this, who uses it, what problem does it solve.]
+
+## Scope
+### In
+- [confirmed things that are included]
+
+### Out
+- [explicitly excluded — equally important]
+
+## Requirements emerging from conversation
+- [bullet per requirement as it surfaces — not yet acceptance criteria, just captured]
+
+## Open questions
+- [ ] [unresolved things that will affect design or implementation]
+
+## Decisions made
+- [date] [decision] — [why]
+
+## Proposed task breakdown
+[filled in by /decompose — leave blank until then]
+```
+
+### Rules for keeping it current
+
+| What happens in conversation | What you do |
+|------------------------------|-------------|
+| User describes the feature | Create overview.md, fill in What/Scope |
+| A new requirement surfaces | Add to Requirements |
+| User rules something out | Move to Scope: Out |
+| An open question gets answered | Check it off, move to Decisions |
+| User changes direction | Update overview, note the pivot in Decisions |
+| A constraint is mentioned | Capture it immediately |
+
+Never let more than one exchange pass without updating the overview if something relevant was said.
+
+---
+
+## Level 2 — Task Specs (/decompose)
+
+When the overview has enough clarity to build — the user says "let's go", "start implementing", or you judge the scope is sufficiently understood — run decompose.
+
+### /decompose
+
+```bash
+./skills/spec-driven/scripts/new-spec.sh --task "task name"
+```
+
+Decompose the overview into task specs following these rules:
+
+**Each task spec must be:**
+- **Atomic** — one concern, one area of the codebase
+- **Independently shippable** — doesn't require another task to be testable
+- **Small** — 3–7 acceptance criteria max. If you need more, split it.
+- **Verifiable** — every AC can be checked by `rlaif-loop.sh` (type check, lint, test)
+
+**Signs a task is too big:**
+- More than 7 ACs
+- Touches more than 2 files/components
+- Requires another task to be "mostly done" first
+- You can't write a test for it without mocking half the system
+
+### Task spec structure
+
+```markdown
+# Task: [Name]
+
+**Overview:** specs/overview.md
+**Status:** Pending | In progress | Done
+
+## Context
+[One sentence: what this task does and why it exists in the broader feature]
+
+## Acceptance Criteria
+- [ ] AC1: Given [precondition], when [action], then [observable outcome]
+- [ ] AC2: ...
+
+## Out of scope for this task
+- [things that belong to other tasks]
+
+## Definition of done
+- [ ] All ACs pass
+- [ ] Types check / go build passes
+- [ ] Tests cover happy path + edge cases in spec
+- [ ] No regressions
+```
+
+### Proposed decomposition for a website
+
+```
+specs/
+  overview.md              ← the full picture
+  task-landing-page.md     ← hero, nav, CTA only
+  task-contact-form.md     ← form, validation, submission
+  task-responsive.md       ← breakpoint work across all pages
+  task-accessibility.md    ← contrast, keyboard nav, ARIA
+```
+
+Update `specs/overview.md` Proposed task breakdown section with the full list once decomposed.
+
+---
+
+## RLAIF Loop (per task spec)
+
+Run this loop for each task spec. Do not run it on the overview.
+
+```
+1. IMPLEMENT  Minimal code to satisfy the spec ACs
+      ↓
+2. EVALUATE   Run: ./skills/spec-driven/scripts/rlaif-loop.sh specs/task-name.md
+              Score each AC: ✅ Pass | ❌ Fail | ⚠ Partial
+      ↓
+3. REFLECT    For each failure: root cause, not symptom
+              Classify: implementation error | spec ambiguity | scope creep
+      ↓
+4. ITERATE    Targeted fix → back to EVALUATE
+              Max 3 iterations before surfacing to user
+      ↓
+DONE when all ACs pass → check them off in the task spec → update overview status
+```
+
+---
+
+## Red Flags
+
+- Waiting for the user to explicitly ask for a spec before capturing requirements — too late
+- Overview with more than 15 bullet requirements — time to decompose
+- Task spec with more than 7 ACs — split it
+- ACs that say "works correctly" or "handles errors" — not testable, rewrite
+- Running RLAIF on the overview instead of a task spec
+- Spec written after implementation — that's documentation
 
 ## The RLAIF Loop
 

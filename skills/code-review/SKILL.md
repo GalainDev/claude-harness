@@ -1,12 +1,11 @@
 ---
 name: code-review
-description: |
-  Structured code review skill. Triggers when the user asks to "review", "review my code",
-  "review this PR", "review the diff", "check this before I merge", "give me feedback on",
-  or "what do you think about this code". Also use proactively after completing a feature
-  implementation to catch issues before committing. Reviews are actionable — every finding
-  includes file, line, severity, and a concrete fix or question.
-  User-invocable via /review.
+description: Structured code review skill. Triggers when the user asks to "review", "review my code", "review this PR", "review the diff", "check this before I merge", "give me feedback on", or "what do you think about this code". Also triggers proactively after completing a feature implementation. Reviews are actionable — every finding includes file, line, severity, and a concrete fix.
+user-invocable: true
+metadata:
+  author: galain
+  version: 1.0.0
+  category: engineering
 ---
 
 # Code Review Skill

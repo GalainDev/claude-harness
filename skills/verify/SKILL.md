@@ -1,13 +1,11 @@
 ---
 name: verify
-description: |
-  Comprehensive verification and quality gate skill. Triggers after any implementation work
-  is complete, when the user asks to "check", "verify", "review", "test", "validate",
-  "make sure this works", or "is this good". Also triggers proactively after finishing
-  a feature, fixing a bug, or completing a refactor — run this before declaring work done.
-  Covers: type checking, linting, unit tests, integration tests, security scanning,
-  performance checks, accessibility audits, and code quality review.
-  Think of this as the pre-commit gate that catches everything before it ships.
+description: Comprehensive verification and quality gate skill. Triggers when the user asks to "check", "verify", "review", "test", "validate", "make sure this works", or "is this good" — and proactively after finishing a feature, bug fix, or refactor. Covers type checking, linting, unit tests, integration tests, security scanning, and code quality review. Run this before declaring work done.
+user-invocable: true
+metadata:
+  author: galain
+  version: 1.0.0
+  category: engineering
 ---
 
 # Verify Skill
@@ -89,12 +87,31 @@ docker compose -f docker-compose.test.yml down
 
 ### Layer 4: E2E (when applicable)
 
-```bash
-# Playwright
-npx playwright test
+**Preferred: agent-browser** (install once: `npm install -g agent-browser && agent-browser install`)
 
-# Cypress
-npx cypress run
+```bash
+# Open the app and get a snapshot of the accessibility tree
+agent-browser open http://localhost:3000
+agent-browser snapshot
+
+# Interact using refs from the snapshot (e.g. @e1, @e2)
+agent-browser click @e3
+agent-browser fill @e1 "test@example.com"
+agent-browser screenshot before-submit.png
+
+# Full session example
+agent-browser open http://localhost:3000/login
+agent-browser snapshot                          # see interactive elements
+agent-browser fill @e1 "user@example.com"
+agent-browser fill @e2 "password123"
+agent-browser click @e3                         # submit button
+agent-browser snapshot                          # verify post-login state
+```
+
+**Fallback: test runner**
+```bash
+npx playwright test    # if Playwright is configured
+npx cypress run        # if Cypress is configured
 ```
 
 Check that critical user paths work:

@@ -1,21 +1,26 @@
 ---
 name: react-frontend
-description: |
-  Expert React and frontend engineering skill. Use this when the user is building UI components,
-  pages, layouts, or any web interface — whether from scratch or modifying existing code.
-  Triggers on: component creation, JSX/TSX work, styling (CSS, Tailwind, CSS-in-JS), state
-  management (useState, useReducer, Zustand, Redux), hooks (custom or built-in), React Router,
-  form handling, accessibility concerns, performance optimization (memoization, lazy loading,
-  virtualization), frontend testing (React Testing Library, Vitest, Playwright), Next.js, Vite,
-  data fetching (React Query, SWR, fetch, axios), animations (Framer Motion, CSS), design systems,
-  and TypeScript in a React context. Also triggers when the user is reviewing or debugging
-  React rendering issues, hydration errors, or layout problems.
+description: Expert React and frontend engineering skill. Use when the user is building UI components, pages, layouts, or any web interface — whether from scratch or modifying existing code. Triggers on component creation, JSX/TSX, Tailwind, state management (useState, Zustand, Redux), custom hooks, React Router, forms, accessibility, performance (memoization, lazy loading), testing (React Testing Library, Vitest, Playwright), Next.js, Vite, data fetching (React Query, SWR), animations (Framer Motion, CSS), and TypeScript in React. Also triggers on rendering issues, hydration errors, or layout debugging.
+metadata:
+  author: galain
+  version: 1.0.0
+  category: frontend
 ---
 
 # React Frontend Skill
 
 A pragmatic, opinionated guide for building production-quality React applications. Bias toward
 modern patterns (hooks, composition, TypeScript) and correctness over cleverness.
+
+## Step 0 — Design direction first
+
+**Before writing any new component or page** (not bug fixes, not refactors — new UI):
+
+1. Consult the `frontend-design` skill — visual direction, typography, color system, anti-slop rules
+2. Confirm the aesthetic direction, theme, and font/color decisions
+3. Then return here for implementation
+
+Skip this only when modifying existing components where the design language is already established.
 
 ## Design System — Check Registry First
 

@@ -1,13 +1,11 @@
 ---
 name: git
-description: |
-  Git workflow skill covering commits, branching, PRs, and history management.
-  Use when the user runs /commit, asks to commit, create a branch, open a PR, review git
-  history, resolve a merge conflict, cherry-pick, rebase, or do anything git-related.
-  Commits produced by this skill are detailed, human-authored-quality messages that serve
-  as the source of truth for the codebase history. Always asks the user whether they want
-  verbose or minimal commit style before proceeding. Never adds AI attribution or tool
-  references to commit messages. User-invocable via /commit or /git.
+description: Git workflow skill covering commits, branching, PRs, and history management. Use when the user runs /commit, asks to commit, create a branch, open a PR, review git history, resolve a merge conflict, cherry-pick, or rebase. Commits are detailed, human-authored-quality messages — always asks verbose or minimal style first. Never adds AI attribution.
+user-invocable: true
+metadata:
+  author: galain
+  version: 1.0.0
+  category: engineering
 ---
 
 # Git Skill

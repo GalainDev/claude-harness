@@ -43,6 +43,7 @@
 | Verify (no e2e) | `./skills/verify/scripts/verify.sh --skip-e2e` |
 | Commit | `/commit` (asks verbose or minimal) |
 | Code review | `/review` |
+| Browser (E2E) | `agent-browser open <url>` → `agent-browser snapshot` → `agent-browser click @eN` |
 
 ## Design Systems
 

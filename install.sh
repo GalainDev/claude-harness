@@ -34,21 +34,6 @@ link() {
   info "Linked: $dst → $src"
 }
 
-copy_if_missing() {
-  local src="$1"
-  local dst="$2"
-  if $DRY_RUN; then
-    echo "  [dry-run] copy $src → $dst (if missing)"
-    return
-  fi
-  if [[ ! -f "$dst" ]]; then
-    cp "$src" "$dst"
-    info "Installed: $dst"
-  else
-    warning "Skipping $dst (already exists — merge manually if needed)"
-  fi
-}
-
 echo ""
 echo "Installing claude harness from: $HARNESS_DIR"
 echo "Target: $CLAUDE_DIR"
@@ -73,8 +58,6 @@ done
 # ── CLAUDE.md (global) ────────────────────────────────────────────────────────
 link "$HARNESS_DIR/CLAUDE.md" "$HOME/CLAUDE.md"
 
-# ── .mcp.json (user-level MCP servers) ───────────────────────────────────────
-link "$HARNESS_DIR/.mcp.json" "$HOME/.mcp.json"
 
 # ── settings.json — merge hooks into existing settings ────────────────────────
 SETTINGS="$CLAUDE_DIR/settings.json"
@@ -88,7 +71,14 @@ elif [[ ! -f "$SETTINGS" ]]; then
 else
   # Merge hooks key using jq if available
   if command -v jq &>/dev/null; then
-    MERGED=$(jq -s '.[0] * .[1]' "$SETTINGS" "$HARNESS_SETTINGS")
+    MERGED=$(jq -s '
+      .[0] as $e | .[1] as $h |
+      ($e * $h) |
+      .hooks.PreToolUse = (
+        (($e.hooks.PreToolUse // []) + ($h.hooks.PreToolUse // []))
+        | unique
+      )
+    ' "$SETTINGS" "$HARNESS_SETTINGS")
     echo "$MERGED" > "$SETTINGS"
     info "Merged hooks into: $SETTINGS"
   else

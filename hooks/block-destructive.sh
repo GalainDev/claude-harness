@@ -1,8 +1,11 @@
 #!/usr/bin/env bash
 # block-destructive.sh — PreToolUse hook for Claude Code
-# Blocks dangerous commands when running in --dangerously-skip-permissions mode.
+# Targeted safety net for truly catastrophic, non-recoverable operations.
+# Does NOT block powerful-but-legitimate git/process operations — those are
+# intentional in an autonomous --dangerously-skip-permissions workflow.
+#
 # Input: JSON via stdin with keys: tool_name, tool_input
-# Exit 0 = allow, Exit 2 = block (message printed to stderr shown to Claude)
+# Exit 0 = allow, Exit 2 = block (message shown to Claude)
 
 set -euo pipefail
 
@@ -10,7 +13,6 @@ INPUT=$(cat)
 TOOL=$(echo "$INPUT" | jq -r '.tool_name // empty')
 COMMAND=$(echo "$INPUT" | jq -r '.tool_input.command // empty')
 
-# Only inspect Bash tool calls
 if [[ "$TOOL" != "Bash" ]]; then
   exit 0
 fi
@@ -20,50 +22,31 @@ block() {
   exit 2
 }
 
-# ── Destructive file operations ──────────────────────────────────────────────
-if echo "$COMMAND" | grep -qE 'rm\s+-[a-zA-Z]*r[a-zA-Z]*f|rm\s+-[a-zA-Z]*f[a-zA-Z]*r'; then
-  block "rm -rf is not allowed. Use trash or explicit file paths."
+# ── Nuclear file deletions (OS / home root) ───────────────────────────────────
+# Block rm targeting /, ~, or $HOME directly — not all rm -rf
+if echo "$COMMAND" | grep -qE 'rm\s+.*(-rf|-fr)\s+(\/|~\/?\s|~$|\$HOME\/?\s|\$HOME$)'; then
+  block "rm -rf on / or home root is not allowed."
 fi
 
-if echo "$COMMAND" | grep -qE '^\s*rm\s+(-[^-\s]*\s+)*(/|~|\$HOME)'; then
-  block "Deleting from root or home directory directly is not allowed."
+# Block wiping the entire home directory contents
+if echo "$COMMAND" | grep -qE 'rm\s+.*(-rf|-fr)\s+~\/\*'; then
+  block "rm -rf ~/* would nuke your home directory."
 fi
 
-# ── Git destructive operations ────────────────────────────────────────────────
-if echo "$COMMAND" | grep -qE 'git\s+(push\s+.*--force|push\s+.*-f\b)'; then
-  block "Force push is blocked. Use --force-with-lease or ask the user."
+# ── Pipe to shell (code injection risk) ──────────────────────────────────────
+if echo "$COMMAND" | grep -qE '(curl|wget)\s+.*\|\s*(bash|sh|zsh|fish)'; then
+  block "Piping curl/wget to a shell is blocked — download and inspect first."
 fi
 
-if echo "$COMMAND" | grep -qE 'git\s+reset\s+--hard'; then
-  block "git reset --hard is blocked. Stage changes or stash first."
-fi
-
-if echo "$COMMAND" | grep -qE 'git\s+clean\s+.*-[a-zA-Z]*f'; then
-  block "git clean -f is blocked — it permanently deletes untracked files."
-fi
-
-if echo "$COMMAND" | grep -qE 'git\s+branch\s+(-D|--delete\s+-f)'; then
-  block "Force branch deletion is blocked. Confirm with user first."
-fi
-
-# ── Database nukes ────────────────────────────────────────────────────────────
-if echo "$COMMAND" | grep -qiE '(DROP\s+(TABLE|DATABASE|SCHEMA)|TRUNCATE\s+TABLE)'; then
-  block "Destructive SQL (DROP/TRUNCATE) is blocked. Confirm with user."
-fi
-
-# ── Process killing ───────────────────────────────────────────────────────────
-if echo "$COMMAND" | grep -qE 'kill\s+-9|killall\s+-9|pkill\s+-9'; then
-  block "SIGKILL (-9) is blocked. Use SIGTERM first or ask the user."
-fi
-
-# ── chmod/chown on system paths ───────────────────────────────────────────────
-if echo "$COMMAND" | grep -qE '(chmod|chown).*\s(/etc|/usr|/bin|/sbin|/System|/Library)'; then
+# ── chmod/chown on macOS system paths ────────────────────────────────────────
+if echo "$COMMAND" | grep -qE '(chmod|chown).*\s+(/System|/Library|/usr/bin|/usr/sbin|/bin|/sbin|/etc)'; then
   block "chmod/chown on system paths is blocked."
 fi
 
-# ── Pipe to shell patterns ────────────────────────────────────────────────────
-if echo "$COMMAND" | grep -qE 'curl.*\|\s*(bash|sh|zsh)|wget.*\|\s*(bash|sh|zsh)'; then
-  block "curl/wget piped to shell is blocked. Download and inspect the script first."
+# ── Destructive SQL on likely production targets ──────────────────────────────
+# Only block if command looks like it's targeting a real DB (not a test/dev one)
+if echo "$COMMAND" | grep -qiE '(DROP\s+(DATABASE|SCHEMA))\s+(?!test|dev|local|tmp)'; then
+  block "DROP DATABASE/SCHEMA blocked — looks like a non-dev database. Confirm manually."
 fi
 
 exit 0

@@ -1,0 +1,21 @@
+{
+  "name": "claude-harness",
+  "version": "0.1.0",
+  "description": "Claude Code skill harness — hooks, skills, and global config",
+  "bin": {
+    "claude-harness": "./bin/claude-harness.js"
+  },
+  "files": [
+    "bin/",
+    "install.sh",
+    "CLAUDE.md",
+    "settings.json",
+    "hooks/",
+    "skills/"
+  ],
+  "engines": {
+    "node": ">=18"
+  },
+  "keywords": ["claude", "claude-code", "ai", "skills"],
+  "license": "MIT"
+}

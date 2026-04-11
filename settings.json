@@ -13,6 +13,15 @@
             "command": "~/.claude/hooks/block-destructive.sh"
           }
         ]
+      },
+      {
+        "matcher": "Read|Glob|Grep",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "~/.claude/hooks/block-sensitive-paths.sh"
+          }
+        ]
       }
     ]
   }

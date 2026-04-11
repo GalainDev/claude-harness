@@ -1,34 +1,96 @@
 #!/usr/bin/env bash
-# new-spec.sh — scaffold a new spec document
-# Usage: ./new-spec.sh "Feature Name"
+# new-spec.sh — scaffold spec documents
+# Usage:
+#   ./new-spec.sh --overview "Feature Name"   # living overview spec
+#   ./new-spec.sh --task "Task Name"           # atomic task spec
+#   ./new-spec.sh "Feature Name"              # defaults to --task
 
 set -euo pipefail
 
-FEATURE_NAME="${1:-Untitled Feature}"
-SLUG=$(echo "$FEATURE_NAME" | tr '[:upper:]' '[:lower:]' | tr ' ' '-' | tr -cd '[:alnum:]-')
+MODE="task"
+NAME=""
+
+# Parse args
+while [[ $# -gt 0 ]]; do
+  case "$1" in
+    --overview) MODE="overview"; shift ;;
+    --task)     MODE="task";     shift ;;
+    *)          NAME="$1";       shift ;;
+  esac
+done
+
+NAME="${NAME:-Untitled}"
+SLUG=$(echo "$NAME" | tr '[:upper:]' '[:lower:]' | tr ' ' '-' | tr -cd '[:alnum:]-')
 DATE=$(date +%Y-%m-%d)
 SPECS_DIR="specs"
-
 mkdir -p "$SPECS_DIR"
 
-SPEC_FILE="$SPECS_DIR/${SLUG}.md"
+write_overview() {
+  local file="$SPECS_DIR/overview.md"
+  if [[ -f "$file" ]]; then
+    echo "Overview already exists: $file (update it in place)"
+    exit 0
+  fi
+  cat > "$file" <<EOF
+# Overview: ${NAME}
 
-if [[ -f "$SPEC_FILE" ]]; then
-  echo "Spec already exists: $SPEC_FILE"
-  exit 1
-fi
+**Last updated:** ${DATE}
+**Status:** Exploring
 
-cat > "$SPEC_FILE" <<EOF
-# Spec: ${FEATURE_NAME}
+---
 
+## What we're building
+
+<!-- One paragraph: what is this, who uses it, what problem does it solve -->
+
+## Scope
+
+### In
+-
+
+### Out
+-
+
+## Requirements emerging from conversation
+
+<!-- Capture requirements as they surface — one bullet per requirement -->
+-
+
+## Open questions
+
+- [ ]
+
+## Decisions made
+
+<!-- [date] decision — why -->
+
+## Proposed task breakdown
+
+<!-- Filled in by /decompose — leave blank until ready -->
+EOF
+  echo "Created: $file"
+  echo "Update it continuously as the conversation develops."
+  echo "Run --task to create atomic task specs when ready to build."
+}
+
+write_task() {
+  local file="$SPECS_DIR/task-${SLUG}.md"
+  if [[ -f "$file" ]]; then
+    echo "Task spec already exists: $file"
+    exit 1
+  fi
+  cat > "$file" <<EOF
+# Task: ${NAME}
+
+**Overview:** specs/overview.md
 **Date:** ${DATE}
-**Status:** Draft
+**Status:** Pending
 
 ---
 
 ## Context
 
-<!-- One paragraph: why does this feature exist, who uses it, what problem does it solve -->
+<!-- One sentence: what this task does and why it exists in the broader feature -->
 
 ## Acceptance Criteria
 
@@ -36,36 +98,24 @@ cat > "$SPEC_FILE" <<EOF
 - [ ] AC2: Given [precondition], when [action], then [observable outcome]
 - [ ] AC3: Edge case — [scenario] results in [behavior]
 
-## Out of Scope
+## Out of scope for this task
 
-- [Things explicitly NOT included in this feature]
+-
 
-## Open Questions
+## Definition of done
 
-- [ ] [Question that needs to be resolved before implementation can begin]
-
-## Definition of Done
-
-- [ ] All acceptance criteria pass
-- [ ] Types check (tsc --noEmit or go build)
-- [ ] Tests cover happy path + at least 2 edge cases
+- [ ] All ACs pass
+- [ ] Types check (tsc --noEmit or go build ./...)
+- [ ] Tests cover happy path + edge cases above
 - [ ] No regressions in adjacent features
-- [ ] Code reviewed
-
----
-
-## Implementation Notes
-
-<!-- Filled in during/after implementation -->
-
-## Decisions Made
-
-<!-- Decision records for choices made during implementation -->
 EOF
+  echo "Created: $file"
+  echo ""
+  echo "Next: fill in ACs, then run the RLAIF loop:"
+  echo "  ./skills/spec-driven/scripts/rlaif-loop.sh $file"
+}
 
-echo "Created spec: $SPEC_FILE"
-echo ""
-echo "Next steps:"
-echo "  1. Fill in Context and Acceptance Criteria"
-echo "  2. Review with stakeholders if needed"
-echo "  3. Start implementation with: spec-driven skill"
+case "$MODE" in
+  overview) write_overview ;;
+  task)     write_task ;;
+esac
