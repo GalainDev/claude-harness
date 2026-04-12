@@ -15,6 +15,19 @@
 - After implementation, run the `verify` skill before declaring done
 - Check `.claude/design.json` or project `CLAUDE.md` before writing any frontend UI code
 
+## Git Operations
+
+**Always use the `git` skill** for commits, PRs, branching, rebasing, and history work — invoke it via the Skill tool. Do NOT use the built-in commit instructions; the `git` skill defines the commit format and process for this environment.
+
+## Environment Variables Convention
+
+Projects use `.env.schema` (committed) + `.env` (gitignored), never `.env.example`:
+
+- `.env.schema` — keys with comments, no values. Committed. Read by Claude and teammates.
+- `.env` — real values only. Never committed. Gitignored.
+
+When scaffolding a project, create `.env.schema` (not `.env.example`). Add `.env` to `.gitignore`, never `.env.schema`.
+
 ## Code Style
 
 **TypeScript/React:**

@@ -36,6 +36,13 @@
       "primaryFont": "Geist, Inter, monospace for code",
       "colorMode": "dark-default",
       "keyTraits": ["dark backgrounds", "subtle glows", "high-contrast text", "muted secondary elements", "monospace accents"]
+    },
+    "ai-saas": {
+      "description": "AI-first SaaS — Cursor, Perplexity, Linear, Clerk. Precision dark UI built for intelligent products. Dense, geometric, one strong accent, command-palette aesthetics.",
+      "path": "systems/ai-saas",
+      "primaryFont": "Geist, Söhne, system-ui",
+      "colorMode": "dark-default",
+      "keyTraits": ["near-black base", "single accent color", "tight spacing", "geometric precision", "no decorative gradients", "high information density", "subtle depth via opacity layering"]
     }
   }
 }

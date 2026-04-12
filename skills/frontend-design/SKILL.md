@@ -1,6 +1,6 @@
 ---
 name: frontend-design
-description: Create distinctive, production-grade frontend interfaces with high design quality. Use this skill when the user asks to build web components, pages, or applications (examples include landing pages, dashboards, React components, marketing sites, or any UI where aesthetics matter). Also triggers on "make it look good", "design this", "build a UI", or when react-frontend needs design direction. Generates creative, polished code that avoids generic AI aesthetics — covers visual direction, typography, color, layout, and motion.
+description: Create distinctive, production-grade frontend interfaces with high design quality. ALWAYS triggers alongside react-frontend — any new React component, page, or layout work requires this skill first for visual direction. Also triggers when the user asks to build web components, pages, or applications (landing pages, dashboards, marketing sites, any UI), or says "make it look good", "design this", "build a UI", "add a page", "create a component". Generates creative, polished code that avoids generic AI aesthetics — covers visual direction, typography, color, layout, and motion. Do not skip this for "small" components — design direction applies even to buttons and forms.
 user-invocable: true
 metadata:
   author: galain
