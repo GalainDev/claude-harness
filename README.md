@@ -4,12 +4,40 @@ Portable Claude Code setup — skills, hooks, and global config. Clone on any ma
 
 ## Skills
 
-| Skill | Triggers on |
-|-------|-------------|
-| `react-frontend` | Components, hooks, styling, state, testing, Next.js, Vite, TypeScript in React |
-| `golang-backend` | Go code, APIs, concurrency, error handling, testing, toolchain |
-| `verify` | After any implementation; "check", "verify", "test", "review" |
-| `spec-driven` | "spec this out", BDD, ATDD, spec-first, RLAIF loop, iterative refinement |
+| Skill | Slash command | Triggers on |
+|-------|--------------|-------------|
+| `git` | `/commit` | Commits, PRs, branching, rebase, history |
+| `code-review` | `/review` | "review this", "check before I merge", PR review |
+| `verify` | `/verify` | After any implementation; "check", "verify", "test" |
+| `security` | `/security` | "security review", "audit this", auth, API exposure |
+| `secrets` | `/secrets` | `.env` files, API keys, env vars, project scaffolding |
+| `design` | `/design` | Set active design system for the project |
+| `frontend-design` | `/frontend-design` | Any new React component, page, or UI work |
+| `polish` | `/polish` | "polish this", "finishing touches", pre-ship UI pass |
+| `debug` | `/debug` | Bug reports, unexpected errors, wrong output |
+| `react-frontend` | — | JSX/TSX, hooks, Tailwind, state, Next.js, Vite, React Query |
+| `golang-backend` | — | Go code, APIs, concurrency, error handling, testing |
+| `spec-driven` | — | "spec this out", BDD, ATDD, RLAIF loop |
+| `domain-driven-design` | — | Bounded contexts, aggregates, domain modelling |
+| `software-architecture` | — | System design, layering, API design, events |
+| `pebbles` | — | Pebbles repo (pb CLI + Dolt) |
+
+### Design systems
+
+Set via `/design` or by writing `.claude/design.json` to the project root:
+
+```json
+{ "system": "ai-saas" }
+```
+
+| Key | Aesthetic | Best for |
+|-----|-----------|---------|
+| `minimal-clean` | Figma, Linear, Raycast | Productivity tools, docs, content-first |
+| `brutalist` | Raw, high-contrast, flat color | Editorial, portfolios, strong brand opinions |
+| `glassmorphism` | Frosted glass, blurs, depth | Consumer apps, mobile-first |
+| `corporate-saas` | Stripe, Notion, Vercel | B2B SaaS, marketing sites, dashboards |
+| `dark-modern` | VS Code, Vercel dashboard | Dev tools, internal dashboards |
+| `ai-saas` | Cursor, Perplexity, Linear | AI-first products, chat interfaces, agent UIs |
 
 ## Hooks
 
@@ -17,11 +45,33 @@ All hooks are purely regex-based — deterministic, zero latency, no API key req
 
 | Hook | Event | Scope | Blocks |
 |------|-------|-------|--------|
-| `block-prompt-injection.sh` | PreToolUse | all tools | Instruction override phrases, role hijack, synthetic system turns, exfiltration instructions in command/content/url |
-| `block-destructive.sh` | PreToolUse | Bash | `rm -rf` on root/home, pipe-to-shell, outbound data exfiltration, reverse shells, cron/LaunchAgent writes, history wipe, destructive SQL |
-| `block-write-risks.sh` | PreToolUse | Write, Edit | Writes to system paths, LaunchAgents, authorized_keys, private key material in content, curl\|sh in shell rc files |
+| `block-prompt-injection.sh` | PreToolUse | all tools | Instruction override phrases, role hijack, synthetic system turns, exfiltration instructions |
+| `block-destructive.sh` | PreToolUse | Bash | `rm -rf` on root/home, pipe-to-shell, data exfiltration, reverse shells, cron/LaunchAgent writes, destructive SQL |
+| `block-write-risks.sh` | PreToolUse | Write, Edit | Writes to system paths, LaunchAgents, authorized_keys, private key material, curl\|sh in shell rc files |
 | `block-sensitive-paths.sh` | PreToolUse | Read, Glob, Grep | `.env`, private keys, AWS credentials, PEM files, service account keys |
-| `block-output-injection.sh` | PostToolUse | WebFetch | Injection phrases in fetched web content before Claude processes it |
+| `block-output-injection.sh` | PostToolUse | WebFetch | Injection phrases in fetched web content |
+
+## Conventions
+
+### Environment variables
+
+Projects use `.env.schema` + `.env` — never `.env.example`:
+
+```bash
+# .env.schema — commit this. Keys with comments, no values.
+DATABASE_URL=        # PostgreSQL connection string
+JWT_SECRET=          # 32+ byte random secret — openssl rand -hex 32
+
+# .env — never commit. Real values only. Gitignored.
+DATABASE_URL=postgres://...
+JWT_SECRET=abc123...
+```
+
+Add `.env` to `.gitignore`, never `.env.schema`. Use `/secrets` for full guidance.
+
+### Git
+
+Use `/commit` for all commits — the `git` skill defines the commit format. Verbose or minimal style, always asks.
 
 ## Install
 
@@ -58,8 +108,6 @@ Re-run after pulling updates — symlinks keep skills and hooks in sync automati
 git checkout v1.0.0
 ./install.sh --overwrite
 ```
-
-This replaces the hooks block in `~/.claude/settings.json` with exactly what that version defined, and relinks all hook symlinks to the checked-out version.
 
 To return to latest:
 
@@ -98,8 +146,27 @@ claude-harness/
 │   ├── block-sensitive-paths.sh
 │   └── block-output-injection.sh
 └── skills/
-    ├── react-frontend/
-    ├── golang-backend/
+    ├── git/
+    ├── code-review/
     ├── verify/
-    └── spec-driven/
+    ├── security/
+    ├── secrets/
+    ├── design/
+    ├── frontend-design/
+    ├── polish/
+    ├── debug/
+    ├── react-frontend/
+    │   └── design/
+    │       └── systems/
+    │           ├── minimal-clean/
+    │           ├── brutalist/
+    │           ├── glassmorphism/
+    │           ├── corporate-saas/
+    │           ├── dark-modern/
+    │           └── ai-saas/
+    ├── golang-backend/
+    ├── spec-driven/
+    ├── domain-driven-design/
+    ├── software-architecture/
+    └── pebbles/
 ```
